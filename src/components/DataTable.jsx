@@ -6,9 +6,8 @@ const columns = [
   { field: 'start', headerName: 'Booking Start', width: 130 },
   { field: 'end', headerName: 'Booking End', width: 130 },
   { field: 'description', headerName: 'Description', width: 200 }
-    // valueGetter: (params) =>`${params.getValue('firstName') || ''} ${params.getValue('lastName') || ''}`
+  // valueGetter: (params) =>`${params.getValue('firstName') || ''} ${params.getValue('lastName') || ''}`
 ];
-
 
 const rows = [
   { id: 1, start: 'Snow', end: 'Jon', description: 35 },
