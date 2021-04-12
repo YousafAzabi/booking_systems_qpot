@@ -11,15 +11,15 @@ const useStyles = makeStyles(theme => ({
 export default function DateTimePicker({ value, handleChange }) {
   const classes = useStyles();
   return(
-      <TextField
-        className={classes.root}
-        required
-        id="datetime-local"
-        label="Start Time"
-        type="datetime-local"
-        defaultValue={value}
-        InputLabelProps={{shrink: true}}
-        onChange={handleChange}
-      />
+    <TextField
+      className={classes.root}
+      required
+      id="datetime-local"
+      label="Start Time"
+      type="datetime-local"
+      defaultValue={value}
+      InputLabelProps={{shrink: true}}
+      onChange={handleChange}
+    />
   );
 }

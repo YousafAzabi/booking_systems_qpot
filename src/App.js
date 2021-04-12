@@ -1,57 +1,46 @@
-import React, { useState, useRef } from 'react';
-import Button from '@material-ui/core/Button';
-import AddIcon from '@material-ui/icons/Add';
-import './App.css';
+import React, { useState, useEffect } from 'react';
 import DataTable from './components/DataTable';
-import AddDialog from './components/AddDialog';
+import AddDialog from './components/BookingDialog';
+import AddButton from './components/AddButton';
 import { url, candidateId } from './config';
+import './App.css';
 
-const addNewBooking = inputData => {
-  fetch(`${url}${candidateId}`, { 
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({...inputData, bookingId: new Date(inputData.bookingStart).getTime()})
-  }).then(response => {
-    response.json();
-  }).then(result => {
-    alert('Success');
-  }).catch(error => {
-    alert('There has been a problem with your fetch operation:', error);
-  });
-}
-
-function App() {
+export default function App() {
   const [openAddDialog, setOpenAddDialog] = useState(false);
-  const [rows, setRows] = useState([]);
-  fetch(`${url}${candidateId}`).then(response => {
-    response.json();
-  }).then(result => {
-    console.log('Success');
-  }).catch(error => {
-    console.log('There has been a problem with your fetch operation:', error);
-  });
+  const [rows, setRows] = useState(null);
+  let selectedRows = [];
+
+  useEffect(() => {
+    fetch(`${url}${candidateId}`)
+    .then(response => response.json())
+    .then(result => {
+      const rows = result.map(row => ({...row, id: row.bookingId}));
+      setRows(rows);
+    }).catch(error => {
+      alert('There has been a problem with loading data:', error);
+    });
+  }, []);
+
+  const handleRowSelected = row => {
+    if (row.isSelected) {
+      selectedRows.push(row.data);
+    } else {
+      selectedRows = selectedRows.filter(r => r.id !== row.data.id);
+    }
+  }
 
   return (
     <div className="App">
-      <Button
-        variant="contained"
-        color="primary"
-        startIcon={<AddIcon />}
-        onClick={() => setOpenAddDialog(true)}
-      >
-        Book Time
-      </Button>
-      <DataTable rows={rows} />
+      <AddButton handleClick={() => setOpenAddDialog(true)} />
+      <DataTable rows={rows} handleRowSelected={handleRowSelected} />
       <AddDialog
         open={openAddDialog}
         handleClose={() => setOpenAddDialog(false)}
-        handleSave={inputData => {
-          addNewBooking(inputData);
+        handleUpdate={data => {
+          setRows([...rows, {...data, id: data.bookingId}]);
           setOpenAddDialog(false);
         }}
       />
     </div>
   );
 }
-
-export default App;
