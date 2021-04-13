@@ -1,6 +1,19 @@
+import AddIcon from '@material-ui/icons/Add';
+import EditIcon from '@material-ui/icons/Edit';
+
 const candidateId = 'WW91c2FmIEF6YWJp';
 
-const url = `https://qotp4gi9x5.execute-api.eu-west-2.amazonaws.com/Test/`;
+const baseUrl = `https://qotp4gi9x5.execute-api.eu-west-2.amazonaws.com/Test/`;
+
+const methods = {
+  'add': 'POST',
+  'edit': 'PUT'
+};
+
+const Icons = {
+  'add': <AddIcon />,
+  'edit': <EditIcon />
+};
 
 const columns = [
   { field: 'id', headerName: 'ID', width: 140 },
@@ -10,7 +23,9 @@ const columns = [
 ];
 
 export {
-  url,
   candidateId,
+  baseUrl,
+  methods,
+  Icons,
   columns
 };

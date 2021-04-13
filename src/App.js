@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import DataTable from './components/DataTable';
-import AddDialog from './components/BookingDialog';
-import AddButton from './components/AddButton';
-import { url, candidateId } from './config';
+import BookingDialog from './components/BookingDialog';
+import ActionButton from './components/ActionButton';
+import { baseUrl, candidateId } from './config';
 import './App.css';
 
 export default function App() {
-  const [openAddDialog, setOpenAddDialog] = useState(false);
+  const [action, setAction] = useState('');
   const [rows, setRows] = useState(null);
-  let selectedRows = [];
+  const [selectedRows, setSelectedRows] = useState([]);
 
   useEffect(() => {
-    fetch(`${url}${candidateId}`)
+    fetch(`${baseUrl}${candidateId}`)
     .then(response => response.json())
     .then(result => {
       const rows = result.map(row => ({...row, id: row.bookingId}));
@@ -22,23 +22,21 @@ export default function App() {
   }, []);
 
   const handleRowSelected = row => {
-    if (row.isSelected) {
-      selectedRows.push(row.data);
-    } else {
-      selectedRows = selectedRows.filter(r => r.id !== row.data.id);
-    }
+      setSelectedRows(row.isSelected ? [...selectedRows, row.data] : selectedRows.filter(r => r.id !== row.data.id));
   }
 
   return (
     <div className="App">
-      <AddButton handleClick={() => setOpenAddDialog(true)} />
+      <ActionButton handleClick={a => setAction(a)} action="add" />
+      <ActionButton handleClick={a => setAction(a)} action="edit" disabled={selectedRows.length !== 1} />
       <DataTable rows={rows} handleRowSelected={handleRowSelected} />
-      <AddDialog
-        open={openAddDialog}
-        handleClose={() => setOpenAddDialog(false)}
+      <BookingDialog
+        action={action}
+        rowData={action === 'edit' && selectedRows[0]}
+        handleClose={() => setAction('')}
         handleUpdate={data => {
           setRows([...rows, {...data, id: data.bookingId}]);
-          setOpenAddDialog(false);
+          setAction('');
         }}
       />
     </div>
