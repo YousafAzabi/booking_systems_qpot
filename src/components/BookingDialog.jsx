@@ -4,39 +4,42 @@ import moment from 'moment';
 import DateTimePicker from './BookingDialogComponent/DateTimePicker';
 import PeriodSelector from './BookingDialogComponent/PeriodSelector';
 import Description from './BookingDialogComponent/Description';
+import Loading from './Loading';
 import { baseUrl, candidateId, methods } from '../config';
 import '../css/AddDialog.css'
 
 const formatDateTime = t => t.format('YYYY-MM-DDTHH:mm').toString();
 
-export default function AddDialog({ action, rowData, handleUpdate, handleClose }) {
-  const [bookingStart, setbookingStart] = useState(formatDateTime(moment.utc()));
-  const [duration, setDuration] = useState('30');
-  const [description, setDescription] = useState('');
+export default function AddDialog({ open, action, rowData, handleUpdate, handleClose }) {
+  const [bookingStart, setbookingStart] = useState();
+  const [duration, setDuration] = useState();
+  const [description, setDescription] = useState();
+  const [saving, setSaving] = useState(false);
 
-  const url = `${baseUrl}${candidateId}/${rowData && rowData.id}`;
+  const url = `${baseUrl}${candidateId}/${action === 'edit' ? rowData.id : ''}`;
 
   useEffect(() => {
     if (rowData) {
       const end = moment(rowData.bookingEnd).diff(rowData.bookingStart);
       setbookingStart(rowData.bookingStart);
-      setDuration(moment.duration(end).asMinutes());
+      setDuration(moment.duration(end).asMinutes().toString());
       setDescription(rowData.description);
+    } else {
+      setbookingStart(formatDateTime(moment.utc()));
+      setDuration('30');
+      setDescription('');
     }
-  }, [action]);
+  }, [action, rowData]);
 
-  const handleSave = () => {
-    const bookingEnd = (moment(bookingStart).add(duration, 'minutes'));
-    const bookingId = new Date(bookingStart).getTime();
-    const data = { bookingStart, bookingEnd, description, bookingId };
-
+  const apiCall = data => {
+    setSaving(true);
     fetch(url, {
       method: methods[action],
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
-    })
-    .then(response => {
-      if (response.status === 200) {
+    }).then(res => {
+      setSaving(false);
+      if (res.status === 200) {
         console.log('Success');
         handleUpdate(data);
       } else {
@@ -45,8 +48,14 @@ export default function AddDialog({ action, rowData, handleUpdate, handleClose }
     });
   }
 
+  const handleSave = () => {
+    const bookingEnd = formatDateTime(moment(bookingStart).add(duration, 'minutes'));
+    const bookingId = new Date(bookingStart).getTime().toString();
+    apiCall({ bookingStart, bookingEnd, description, bookingId })
+  }
+
   return(
-    <Dialog open={!!action} onClose={handleClose} aria-labelledby="form-dialog-title">
+    <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
       <DialogTitle id="form-dialog-title">Booking Time Slot</DialogTitle>
       <DialogContent>
         <div className="date-time-container">
@@ -59,6 +68,7 @@ export default function AddDialog({ action, rowData, handleUpdate, handleClose }
         <Button onClick={handleClose} color="primary">Cancel</Button>
         <Button onClick={handleSave} color="primary">Save</Button>
       </DialogActions>
+      {saving && <Loading />}
     </Dialog>
   );
 }

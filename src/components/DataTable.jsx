@@ -2,7 +2,7 @@ import React from 'react';
 import { DataGrid } from '@material-ui/data-grid';
 import { columns } from '../config';
 
-export default function DataTable({ rows, handleRowSelected }) {
+export default function DataTable({ rows, handleSelection }) {
   return (
     <div style={{ height: 400, width: '100%' }}>
       <DataGrid
@@ -12,7 +12,7 @@ export default function DataTable({ rows, handleRowSelected }) {
         loading={!rows}
         checkboxSelection
         disableSelectionOnClick
-        onRowSelected={handleRowSelected}
+        onSelectionModelChange={handleSelection}
       />
     </div>
   );

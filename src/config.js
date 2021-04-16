@@ -1,5 +1,6 @@
 import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 const candidateId = 'WW91c2FmIEF6YWJp';
 
@@ -7,12 +8,14 @@ const baseUrl = `https://qotp4gi9x5.execute-api.eu-west-2.amazonaws.com/Test/`;
 
 const methods = {
   'add': 'POST',
-  'edit': 'PUT'
+  'edit': 'PUT',
+  'delete': 'DELETE'
 };
 
 const Icons = {
   'add': <AddIcon />,
-  'edit': <EditIcon />
+  'edit': <EditIcon />,
+  'delete': <DeleteIcon />
 };
 
 const columns = [
