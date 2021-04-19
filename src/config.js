@@ -25,10 +25,16 @@ const columns = [
   { field: 'description', headerName: 'Description', width: 400 }
 ];
 
+const timeRange = {
+  min: {h: 9, m: 0},
+  max: {h: 16, m: 30}
+}
+
 export {
   candidateId,
   baseUrl,
   methods,
   Icons,
-  columns
+  columns,
+  timeRange
 };

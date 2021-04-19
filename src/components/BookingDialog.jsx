@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button } from '@material-ui/core';
 import moment from 'moment';
-import DateTimePicker from './BookingDialogComponent/DateTimePicker';
+import BookingStartPicker from './BookingDialogComponent/BookingStartPicker';
 import PeriodSelector from './BookingDialogComponent/PeriodSelector';
 import Description from './BookingDialogComponent/Description';
 import Loading from './Loading';
-import { baseUrl, candidateId, methods } from '../config';
+import { baseUrl, candidateId, methods, timeRange } from '../config';
 import '../css/AddDialog.css'
 
 const formatDateTime = t => t.format('YYYY-MM-DDTHH:mm').toString();
@@ -25,7 +25,7 @@ export default function AddDialog({ open, action, rowData, handleUpdate, handleC
       setDuration(moment.duration(end).asMinutes().toString());
       setDescription(rowData.description);
     } else {
-      setbookingStart(formatDateTime(moment.utc()));
+      setbookingStart(formatDateTime(moment.utc().startOf('day').add(9, 'hours')));
       setDuration('30');
       setDescription('');
     }
@@ -59,7 +59,7 @@ export default function AddDialog({ open, action, rowData, handleUpdate, handleC
       <DialogTitle id="form-dialog-title">Booking Time Slot</DialogTitle>
       <DialogContent>
         <div className="date-time-container">
-          <DateTimePicker value={bookingStart} handleChange={e => setbookingStart(e.target.value)}/>
+          <BookingStartPicker value={bookingStart} timeRange={timeRange} handleChange={date => setbookingStart(formatDateTime(date))} />
           <PeriodSelector value={duration} handleChange={e => setDuration(e.target.value)} />
         </div>
         <Description value={description} handleChange={e => setDescription(e.target.value)} />
