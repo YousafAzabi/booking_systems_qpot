@@ -11,20 +11,23 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const TIME_FORMAT = 'HH:mm';
+const DEFAULT_TIME_RANGE = {
+  start: {'hour': 0, 'minute': 0, 'second': 0},
+  finish: {'hour': 23, 'minute': 59, 'second': 59}
+};
 
-export default function BookingStartPicker({ value, timeRange, handleChange }) {
+export default function BookingStartPicker({ value, timeRange = DEFAULT_TIME_RANGE, handleChange }) {
   const classes = useStyles();
   
   const handleDateChange = date => {
-    const startTime = moment(date, TIME_FORMAT).hour(timeRange.min.h).minute(timeRange.min.m);
-    const endTime = moment(date, TIME_FORMAT).hour(timeRange.max.h).minute(timeRange.max.m);
+    const startTime = moment(date).set(timeRange.start);
+    const endTime = moment(date).set(timeRange.finish).subtract(30, 'minute');
 
     if (date.isBetween(startTime, endTime, undefined, '[]')) {
       handleChange(date);
     } else {
       alert('Selected Time is not in the working office hours. Time has been adjested. Please re-select.');
-      handleChange(date.startOf('day').add(9, 'hours'));
+      handleChange(date.set(timeRange.start));
     }
   }
   
@@ -37,10 +40,7 @@ export default function BookingStartPicker({ value, timeRange, handleChange }) {
         onChange={handleDateChange}
         disablePast
         shouldDisableDate={date => date.day() === 0 || date.day() === 6}
-        minutesStep={10}
-        ampm={false}
-        minTime={"10:00"}
-
+        minutesStep={5}
       />
     </MuiPickersUtilsProvider>
   );
