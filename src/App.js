@@ -45,7 +45,7 @@ export default function App() {
       setSelectedRowsIds([]);
     } else {
       const newRow = {...data, id: data.bookingId};
-      const oldRows = (action === 'edit') ? rows.filter(r => r.id !== data.bookingId) : rows;
+      const oldRows = rows.filter(r => r.id !== data.bookingId);
       setRows([newRow, ...oldRows]);
     }
     setAction('');

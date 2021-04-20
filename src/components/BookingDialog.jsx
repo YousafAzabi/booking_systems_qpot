@@ -51,7 +51,7 @@ export default function AddDialog({ open, action, rowData, handleUpdate, handleC
 
   const handleSave = () => {
     const bookingEnd = formatDateTime(moment(bookingStart).add(duration, 'minutes'));
-    const bookingId = new Date(bookingStart).getTime().toString();
+    const bookingId = action === 'edit' ? rowData.id : new Date(bookingStart).getTime().toString();
     apiCall({ bookingStart, bookingEnd, description, bookingId })
   }
 
