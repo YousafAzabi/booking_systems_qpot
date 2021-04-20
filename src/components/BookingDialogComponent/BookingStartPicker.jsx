@@ -1,9 +1,9 @@
 import React from 'react';
 import moment from 'moment';
 import MomentUtils from '@date-io/moment';
-// import {LocalizationProvider, DateTimePicker, AdapterDateFns} from "@material-ui/lab/";
 import { DateTimePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
 import { makeStyles } from '@material-ui/core/styles';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -18,7 +18,8 @@ const DEFAULT_TIME_RANGE = {
 
 export default function BookingStartPicker({ value, timeRange = DEFAULT_TIME_RANGE, handleChange }) {
   const classes = useStyles();
-  
+  const { enqueueSnackbar } = useSnackbar();
+
   const handleDateChange = date => {
     const startTime = moment(date).set(timeRange.start);
     const endTime = moment(date).set(timeRange.finish).subtract(30, 'minute');
@@ -26,8 +27,8 @@ export default function BookingStartPicker({ value, timeRange = DEFAULT_TIME_RAN
     if (date.isBetween(startTime, endTime, undefined, '[]')) {
       handleChange(date);
     } else {
-      alert('Selected Time is not in the working office hours. Time has been reset to start of the day. Please re-select or book.');
-      handleChange(date.set(timeRange.start));
+      enqueueSnackbar('Selected Time is out of booking hours.', {variant: 'warning'});
+      handleChange(date, true);
     }
   }
   

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, Button } from '@material-ui/core';
 import moment from 'moment';
+import { useSnackbar } from 'notistack';
 import BookingStartPicker from './BookingDialogComponent/BookingStartPicker';
 import PeriodSelector from './BookingDialogComponent/PeriodSelector';
 import Description from './BookingDialogComponent/Description';
@@ -11,10 +12,12 @@ import '../css/AddDialog.css'
 const formatDateTime = t => t.format('YYYY-MM-DDTHH:mm').toString();
 
 export default function AddDialog({ open, action, rowData, handleUpdate, handleClose }) {
+  const { enqueueSnackbar } = useSnackbar();
   const [bookingStart, setBookingStart] = useState();
   const [duration, setDuration] = useState();
   const [description, setDescription] = useState();
   const [disbaledHourTimeSlot, setDisbaledHourTimeSlot] = useState(false);
+  const [disableSave, setDisableSave] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const url = `${baseUrl}${candidateId}/${action === 'edit' ? rowData.id : ''}`;
@@ -33,6 +36,7 @@ export default function AddDialog({ open, action, rowData, handleUpdate, handleC
       setDescription('');
       checkHourTimeSlotAvailability(start);
     }
+    setDisableSave(false);
   }, [action, rowData]);
 
   const checkHourTimeSlotAvailability = date => {
@@ -44,9 +48,10 @@ export default function AddDialog({ open, action, rowData, handleUpdate, handleC
     }
   }
 
-  const handleDateChange = date => {
-    setBookingStart(formatDateTime(date));
+  const handleDateChange = (date, flag = false) => {
+    setDisableSave(flag);
     checkHourTimeSlotAvailability(date);
+    setBookingStart(formatDateTime(date));
   }
 
   const handleSave = () => {
@@ -64,16 +69,16 @@ export default function AddDialog({ open, action, rowData, handleUpdate, handleC
     }).then(res => {
       setSaving(false);
       if (res.status === 200) {
-        console.log('Success');
+        enqueueSnackbar('Booking has been saved.', {variant: 'success'});
         handleUpdate(data);
       } else {
-        console.log('There has been a problem saving the booking');
+        enqueueSnackbar('There is a problem saving the booking. Please try again...', {variant: 'info'});
       }
     });
   }
 
   return(
-    <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+    <Dialog open={open} disableBackdropClick aria-labelledby="form-dialog-title">
       <DialogTitle id="form-dialog-title">Booking Time Slot</DialogTitle>
       <DialogContent>
         <DialogContentText>
@@ -89,7 +94,7 @@ export default function AddDialog({ open, action, rowData, handleUpdate, handleC
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} color="primary">Cancel</Button>
-        <Button onClick={handleSave} color="primary">Save</Button>
+        <Button onClick={handleSave} color="primary" disabled={disableSave}>Save</Button>
       </DialogActions>
       {saving && <Loading />}
     </Dialog>
