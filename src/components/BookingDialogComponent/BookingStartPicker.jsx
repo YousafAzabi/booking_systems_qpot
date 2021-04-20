@@ -26,7 +26,7 @@ export default function BookingStartPicker({ value, timeRange = DEFAULT_TIME_RAN
     if (date.isBetween(startTime, endTime, undefined, '[]')) {
       handleChange(date);
     } else {
-      alert('Selected Time is not in the working office hours. Time has been adjested. Please re-select.');
+      alert('Selected Time is not in the working office hours. Time has been reset to start of the day. Please re-select or book.');
       handleChange(date.set(timeRange.start));
     }
   }

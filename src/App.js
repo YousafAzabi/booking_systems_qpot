@@ -10,7 +10,6 @@ export default function App() {
   const [action, setAction] = useState('');
   const [rows, setRows] = useState(null);
   const [selectedRowsIds, setSelectedRowsIds] = useState([]);
-  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     fetch(`${baseUrl}${candidateId}`)
@@ -32,18 +31,18 @@ export default function App() {
     setAction(action);
     Promise.all(selectedRowsIds.map(id => deleteRow(id)))
     .then(val => {
-      updateTable('delete');
-      alert('Success deleted all selected booking(s).');
+      updateTable();
+      alert(`Successfully deleted ${selectedRowsIds.length > 1 ? 'all selected bookings.' : 'selected booking.'}`);
     }).catch(err => {
-      updateTable('delete');
+      updateTable();
       alert(`Error deleting booking(s): ${err}`);
     });
   }
 
   const updateTable = data => {
-    if (action === 'delete') {
+    if (!data) {
+      setRows(rows.filter(r => !selectedRowsIds.includes(r.id)));
       setSelectedRowsIds([]);
-      setRows(rows.filter(r => !selectedRowsIds.includes(r)));
     } else {
       const newRow = {...data, id: data.bookingId};
       const oldRows = (action === 'edit') ? rows.filter(r => r.id !== data.bookingId) : rows;

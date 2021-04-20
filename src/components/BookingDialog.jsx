@@ -25,21 +25,28 @@ export default function AddDialog({ open, action, rowData, handleUpdate, handleC
       setBookingStart(rowData.bookingStart);
       setDuration(moment.duration(end).asMinutes().toString());
       setDescription(rowData.description);
+      checkHourTimeSlotAvailability(rowData.bookingStart);
     } else {
-      setBookingStart(formatDateTime(moment.utc().set(workingHours.start)));
+      const start = formatDateTime(moment.utc().set(workingHours.start));
+      setBookingStart(start);
       setDuration('30');
       setDescription('');
+      checkHourTimeSlotAvailability(start);
     }
   }, [action, rowData]);
 
-  const handleDateChange = date => {
-    setBookingStart(formatDateTime(date));
-    if (date.isAfter(moment(date).set(workingHours.start).subtract(60, 'minute'))) {
+  const checkHourTimeSlotAvailability = date => {
+    if (moment(date).isAfter(moment(date).set(workingHours.finish).subtract(60, 'minute'))) {
       setDuration('30');
       setDisbaledHourTimeSlot(true);
-    } else {
+    } else if (disbaledHourTimeSlot) {
       setDisbaledHourTimeSlot(false);
     }
+  }
+
+  const handleDateChange = date => {
+    setBookingStart(formatDateTime(date));
+    checkHourTimeSlotAvailability(date);
   }
 
   const handleSave = () => {
